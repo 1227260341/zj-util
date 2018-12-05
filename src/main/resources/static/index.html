@@ -1,0 +1,138 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>My WebSocket</title>
+	<style>
+		@keyframes mymove
+		{
+		from {top:0px;}
+		to {top:200px; animation-fill-mode : forwards}
+		
+		}
+		
+		@-moz-keyframes mymove /* Firefox */
+		{
+		from {top:0px;}
+		to {top:200px;}
+		}
+		
+		@-webkit-keyframes mymove /* Safari and Chrome */
+		{
+		from {top:0px;}
+		to {top:200px;}
+		}
+		
+		@-o-keyframes mymove /* Opera */
+		{
+		from {top:0px;}
+		to {top:200px;}
+}
+	</style>
+	
+	<script src="/jquery/jquery.min.js?v=2.1.4"></script>
+    <script src="/js/layui/layui.all.js"></script>
+</head>
+<body id="body"  style="background-image:url(./img/8-1402231F6214F.jpg)">
+<div id="welcome" style="background: rgb(238, 238, 238); padding: 5px 10px; border: 1px solid rgb(204, 204, 204);
+ border-image: none;font-size: 35px;    line-height: 50px;    text-align: center;height: 50px;">Welcome</div>
+
+<div id="content" style="margin: 20px auto 0px; border: 1px solid red; border-image: none; 
+	width: 300px; height: 200px;background-color: beige;    box-shadow: -38px 25px 31px #888888;
+	border-radius: 10px; position:relative;
+	animation:mymove 5s infinite;
+	-moz-animation:mymove 5s infinite; /* Firefox */
+	-webkit-animation:mymove 5s infinite; /* Safari and Chrome */
+	-o-animation:mymove 5s infinite; /* Opera */
+	animation-fill-mode : forwards;
+	">
+	<div style="margin-top: 40px;margin-left:20px;">用户名：<input id="userName" type="text" placeholder="请输入用户名" /></div>
+	
+	<div style="margin-top: 20px;margin-left:20px;">密&nbsp;&nbsp;&nbsp;码：<input id="password" type="password" placeholder="请输入密码" /></div>
+	
+	<p style="text-align:center;margin-top:40px;">
+		<button onclick="login()" style= "width: 140px;height: 40px;" >登录</button>
+		<a style="padding-left:5px" href="#" onclick="registerUser()">注册</a>
+	</p>
+</div>
+
+<div id="message">&nbsp;</div>
+
+<script src="/jquery/jquery.min.js?v=2.1.4"></script>
+<script>
+
+	document.onkeydown = function(e) {
+		var keyCode = e.keyCode || e.which || e.charCode;
+        if(keyCode == 13) {
+        	$("#content button").click();
+        }
+	}
+
+	function login() {
+		var userName = $("#userName").val();
+		var password = $("#password").val();
+		if (userName == null || userName == "") {
+			alert("请输入用户名！");
+			return;
+		}
+		if (password == null || password == "") {
+			alert("请输入密码！");
+			return;
+		}
+		var params = {
+			userName:userName,
+			password:password
+		}
+		$.ajax({
+			url:"/user/login",
+			type:"GET",
+			data:params,
+			dataType:"json",
+			success:function(res) {
+				if(res.code == 0) {
+					alert("登录成功！");
+					sessionStorage.setItem("userId", res.data.id);
+					sessionStorage.setItem("user", JSON.stringify(res.data));
+					location.href = "/chat.html";
+				} else {
+					alert(res.message);
+				}
+			}
+		});
+	}
+	
+	//$('.music').css({'-webkit-animation-play-state':'paused','animation-play-state':'paused'});
+	$("#body").bind("click", function(e) {
+		$("#content").css({'-webkit-animation-play-state':'paused','animation-play-state':'paused'});
+	});
+	
+	$("#welcome").bind("click", function(e) {
+		e.stopPropagation();
+		e.preventDefault(); 
+		$("#content").css({'-webkit-animation-play-state':'running','animation-play-state':'running'});
+	});
+	
+	//注册用户用户
+  	function registerUser() {
+  		layer.open({
+  		  type: 2,
+  		  title: '注册用户',
+  		  shadeClose: true,
+  		  shade: 0.8,
+  		  area: ['400px', '450px'],
+  		  content: '/view/register.html', //iframe的url
+  		  //content: '/view/upload.html', //iframe的url
+  		  /* //只有当点击confirm框的确定时，该层才会关闭
+          cancel: function(index){ 
+            if(confirm('确定要关闭么')){
+              layer.close(index);
+            }
+            return false; 
+          } */
+  		}); 
+  	}
+	
+</script>
+
+</body>
+</html>

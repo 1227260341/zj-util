@@ -1,0 +1,23 @@
+server:
+  port: 6666
+spring:
+  application:
+    name: util
+  resources:
+    static-locations: classpath:/META-INF/resources/,classpath:/resources/,classpath:/static/,classpath:/public/,file:/www/ecampus/static/
+      ,file:///D:\project\zj-websocket\zj-websocket-chat/files/
+    
+  datasource:
+    driverClassName: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3307/zj_websocket?characterEncoding=utf-8
+    username: root
+    password: root
+
+mybatis:
+  config-location: classpath:mybatis-config.xml
+  type-aliases-package: com.zj.modules.domain
+  type-handlers-package: com.zj.modules.mapper
+  mapper-locations: classpath:com.zj.modules.mapper/*.xml
+    
+    
+    
