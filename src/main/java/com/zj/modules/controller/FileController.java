@@ -9,6 +9,13 @@ import java.io.FileWriter;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 
+/**
+ * 简单字节或字符流实现
+ *
+ * @author zj
+ * 
+ * 2018年12月5日
+ */
 public class FileController {
 
 	/**
@@ -78,6 +85,11 @@ public class FileController {
 		fr.close();
 	}
 	
+	/**
+	 * 将字节流转换成字符流
+	 * zj
+	 * 2018年12月13日
+	 */
 	public static void characterIn2() throws Exception {
 		File file = new File("D:/write.txt");
 		FileInputStream fis = new FileInputStream(file);

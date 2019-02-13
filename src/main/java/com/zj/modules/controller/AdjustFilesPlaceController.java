@@ -37,7 +37,13 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 
-
+/**
+ * 调整电脑文件位置
+ *
+ * @author zj
+ * 
+ * 2018年12月5日
+ */
 @RequestMapping("/adjustFilesPlace")
 @Controller
 public class AdjustFilesPlaceController {

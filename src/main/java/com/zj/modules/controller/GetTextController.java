@@ -38,7 +38,13 @@ import org.springframework.web.servlet.ModelAndView;
 import com.zj.modules.util.ParseText;
 
 
-
+/**
+ * 获取附件等的文本
+ *
+ * @author zj
+ * 
+ * 2018年12月5日
+ */
 @RequestMapping("/enclosure")
 @Controller
 public class GetTextController {

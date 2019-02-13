@@ -5,6 +5,7 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -29,6 +30,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.beanutils.PropertyUtilsBean;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.poi.ss.formula.functions.T;
+import org.apache.tools.zip.ZipEntry;
+import org.apache.tools.zip.ZipOutputStream;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -696,6 +699,40 @@ public class PropertiesUtil {
         System.out.println(result);
 		return result;
 	}
+	
+	/**
+	 * 批量压缩并下载
+	 * zj
+	 * 2018年12月8日
+	 */
+	public static void batchZipDownload(HttpServletRequest request, HttpServletResponse response, String filePaths,
+			String fileNames, String fileZipName, String fileZipPath) {
+        byte[] buffer = new byte[1024];  
+        try {
+            ZipOutputStream out = new ZipOutputStream(new FileOutputStream(fileZipPath));  
+            String[] files=filePaths.split("\\|",-1);
+            String[] names=fileNames.split("\\|",-1);
+            // 下载的文件集合
+            for (int i = 0; i < files.length; i++) {  
+                FileInputStream fis = new FileInputStream(files[i] + names[i]);  
+                out.putNextEntry(new ZipEntry(names[i])); 
+                 //设置压缩文件内的字符编码，不然会变成乱码  
+                out.setEncoding("GBK");  
+                int len;  
+                // 读入需要下载的文件的内容，打包到zip文件  
+                while ((len = fis.read(buffer)) > 0) {  
+                    out.write(buffer, 0, len);  
+                }  
+                out.closeEntry();  
+                fis.close();  
+            }
+             out.close();  
+             downloadFile(request, response, fileZipPath, fileZipName);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 	
 	
 }
