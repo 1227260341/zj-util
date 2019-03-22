@@ -21,6 +21,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
@@ -32,9 +34,13 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.poi.ss.formula.functions.T;
 import org.apache.tools.zip.ZipEntry;
 import org.apache.tools.zip.ZipOutputStream;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.zj.modules.util.LogUtils;
 
 
 /**
@@ -49,6 +55,9 @@ public class PropertiesUtil {
 	static String[] units = { "", "十", "百", "千", "万", "十万", "百万", "千万", "亿",
 			"十亿", "百亿", "千亿", "万亿" };
 	static char[] numArray = { '零', '一', '二', '三', '四', '五', '六', '七', '八', '九' };
+	
+	//专门用于分隔
+	static Pattern separator = Pattern.compile(",");
 	
 	
 	/**
@@ -125,6 +134,9 @@ public class PropertiesUtil {
 	 * 2017年10月24日
 	 */
 	public static boolean isEmptyString(String str) {
+		if (str != null) {
+			str = replaceBlank(str);
+		}
 		if (str == null || "".equals(str)) {
 			return true;
 		}
@@ -599,21 +611,27 @@ public class PropertiesUtil {
 			response.reset();
 			response.setContentType("application/vnd.ms-excel;charset=utf-8");
 			response.setHeader("Content-Disposition", "attachment;filename=\"" + fileName + "\"");
+			// 获取文件输出IO流  
 			ServletOutputStream out = response.getOutputStream();
 			BufferedInputStream bis = null;
 			BufferedOutputStream bos = null;
 			try {
+				// 放到缓冲流里面 
 			    bis = new BufferedInputStream(is);
+			    // 读取目标文件，通过response将目标文件写到客户端
 			    bos = new BufferedOutputStream(out);
 			    byte[] buff = new byte[2048];
+			    // 写文件
 			    int bytesRead;
 			    // Simple read/write loop.
+			    // 开始向网络传输文件流  
 			    while (-1 != (bytesRead = bis.read(buff, 0, buff.length))) {
-				bos.write(buff, 0, bytesRead);
+			    	bos.write(buff, 0, bytesRead);
 			    }
 			} catch (final IOException e) {
 			    throw e;
 			} finally {
+//				bos.flush();// 这里一定要调用flush()方法  
 			    if (bis != null)
 				bis.close();
 			    if (bos != null)
@@ -628,6 +646,72 @@ public class PropertiesUtil {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	/**
+	 * 批量压缩并下载
+	 * zj
+	 * 2018年12月8日
+	 */
+	public static void batchZipDownload(HttpServletRequest request, HttpServletResponse response, String filePaths,
+			String fileNames, String fileZipName, String fileZipDir) {
+        byte[] buffer = new byte[1024];  
+        try {
+        	fileZipDir = getDemoPath(fileZipDir);
+        	fileZipName.replaceAll("/", "_");
+        	fileZipDir += "/" + fileZipName;
+            ZipOutputStream out = new ZipOutputStream(new FileOutputStream(fileZipDir));  
+            String[] files=filePaths.split(",",-1);
+            String[] names=fileNames.split(",",-1);
+            // 下载的文件集合
+            for (int i = 0; i < files.length; i++) {  
+                FileInputStream fis = new FileInputStream(files[i]);  
+                out.putNextEntry(new ZipEntry(names[i])); 
+                 //设置压缩文件内的字符编码，不然会变成乱码  
+                out.setEncoding("GBK");  
+                int len;  
+                // 读入需要下载的文件的内容，打包到zip文件  
+                while ((len = fis.read(buffer)) > 0) {  
+                    out.write(buffer, 0, len);  
+                }  
+                out.closeEntry();  
+                fis.close();  
+            }
+             out.close();  
+             downloadFile(request, response, fileZipDir, fileZipName);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+	
+	public static String getDemoPath(String folderName) {
+		String tFilePath = System.getProperty("user.dir");
+		LogUtils.info("user.dir path=" + tFilePath);
+		if (PropertiesUtil.isEmptyString(tFilePath) || "/".equals(tFilePath)) {
+			HttpServletRequest request = getRequestAttributes().getRequest();
+			String realPath = request.getSession().getServletContext().getRealPath("/");
+			tFilePath = realPath;
+			LogUtils.info("getRealPath path=" + tFilePath);
+		}
+		tFilePath = tFilePath.replaceAll("\\\\", "/");
+		tFilePath = tFilePath + "/temp/" + folderName;
+		File file = new File(tFilePath);
+		if (!file.exists()) {//不存在文件夹 则进行创建
+			file.mkdirs();
+		}
+		
+		return tFilePath; 
+	}
+	
+	/**
+	 * 获取 RequestAttributes
+	 * zj
+	 * 2018年8月31日
+	 */
+	public static ServletRequestAttributes getRequestAttributes() {
+		ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes)RequestContextHolder.getRequestAttributes();
+		return servletRequestAttributes;
 	}
 	
 	/**
@@ -701,38 +785,37 @@ public class PropertiesUtil {
 	}
 	
 	/**
-	 * 批量压缩并下载
+	 * 去除空格、回车、换行符、制表符
+	 * \n 回车(\u000a) 
+	 * \t 水平制表符(\u0009) 
+	 * \s 空格(\u0008) 
+	 * \r 换行(\u000d)
 	 * zj
-	 * 2018年12月8日
+	 * 2018年12月21日
 	 */
-	public static void batchZipDownload(HttpServletRequest request, HttpServletResponse response, String filePaths,
-			String fileNames, String fileZipName, String fileZipPath) {
-        byte[] buffer = new byte[1024];  
-        try {
-            ZipOutputStream out = new ZipOutputStream(new FileOutputStream(fileZipPath));  
-            String[] files=filePaths.split("\\|",-1);
-            String[] names=fileNames.split("\\|",-1);
-            // 下载的文件集合
-            for (int i = 0; i < files.length; i++) {  
-                FileInputStream fis = new FileInputStream(files[i] + names[i]);  
-                out.putNextEntry(new ZipEntry(names[i])); 
-                 //设置压缩文件内的字符编码，不然会变成乱码  
-                out.setEncoding("GBK");  
-                int len;  
-                // 读入需要下载的文件的内容，打包到zip文件  
-                while ((len = fis.read(buffer)) > 0) {  
-                    out.write(buffer, 0, len);  
-                }  
-                out.closeEntry();  
-                fis.close();  
-            }
-             out.close();  
-             downloadFile(request, response, fileZipPath, fileZipName);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+	public static String replaceBlank(String str) {
+		String result = "";
+		if (str!=null) {
+			Pattern p = Pattern.compile("\\s*|\t|\r|\n");
+			Matcher m = p.matcher(str);
+			result = m.replaceAll("");
+		}
+		return result;
+	}
+	
+	/**
+	 * split 以逗号分隔
+	 * zj
+	 * 2018年12月25日
+	 */
+	public static String[] splitForComma(String str) {
+		String[] result = {};
+		if (str!=null) {
+			result = separator.split(str);
+			
+		}
+		return result;
+	}
 	
 	
 }
