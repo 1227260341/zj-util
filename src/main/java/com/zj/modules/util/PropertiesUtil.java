@@ -21,6 +21,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -40,6 +41,10 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zj.modules.util.LogUtils;
 
 
@@ -817,5 +822,36 @@ public class PropertiesUtil {
 		return result;
 	}
 	
+	/**
+	 * 将json字符串转换成map
+	 * @author zj
+	 * @param jsonString
+	 * @return
+	 * 创建时间：2019年4月11日 下午12:21:23
+	 */
+	public static Map<String, Object> jsonStringToMap(String jsonString) {
+		ObjectMapper mapper = new ObjectMapper();
+		Map<String, Object> map = new HashMap<String, Object>();
+		try {
+			map = mapper.readValue(jsonString,
+					new TypeReference<HashMap<String, Object>>() {
+					});
+			Set<String> set = map.keySet();
+			Iterator<String> it = set.iterator();
+			while (it.hasNext()) {
+				String key = (String) it.next();
+				String values = map.get(key).toString();
+				values = values.trim();
+				map.put(key, values);
+			}
+		} catch (JsonParseException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return map;
+	}
 	
 }
