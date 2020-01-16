@@ -1,3 +1,5 @@
+java 技术栈 及工具常用 插件 及快捷键等
+
 
 框架等：
 Swagger （https://blog.csdn.net/sanyaoxu_2/article/details/80555328）
@@ -20,6 +22,10 @@ Feign在RestTemplate的基础上对其封装，由它来帮助我们定义和实
 
 
 eclipse 常用的插件
+
+MyBatipse 
+这个插件ctrl+左键点击mapper的方法最后一个就是可以跳转到xml 
+
 JRebel 热部署
 https://blog.csdn.net/weixin_42245930/article/details/83443287
 
@@ -32,24 +38,6 @@ lombok工具插件 （@Data,）
     <groupId>org.projectlombok</groupId>    
     <artifactId>lombok</artifactId>
 </dependency>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 idea 常用插件
@@ -71,6 +59,8 @@ Tools -- >  Mybatis Log Plugin  打开其日志框，注意其转换的SQL不是
 4、Jrebel
 是一款比较常见的热部署插件，一般用于Run模式下的自动编译，破译版本
 
+5，Auto filling 
+Alt +Enter 自动补全 方法需要的参数
 
 
 
@@ -104,7 +94,6 @@ Alt + /                                 代码提示
 
 
 idea 快捷键
-
 Ctrl + f                           查找当前所在文件的内容 关键词
 Ctrl + Shift + F               全局搜索 关键词
 Ctrl + Alt + O                  java页面一键导包及去除无用包及排序包
@@ -121,6 +110,8 @@ Ctrl + Shirft + 上下键       上下移动代码
 Ctrl + z                            撤销
 Ctrl + Shirft + Z               取消撤销的操作
 Ctrl + O                           查找我们继承的类活接口中的方法，以及我们要实现的方法
-
-
+Ctrl + Alt + 空格键            代码补全提示
+Ctrl + Alt + S                    进入设置页面
+Ctrl + Alt + v                     补全方法的返回值
+sout                                 system.out.println;快捷方式
 
