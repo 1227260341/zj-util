@@ -247,6 +247,30 @@ select access_token from (select access_token  from um_auth_token group by acces
 alter table um_auth_token add UNIQUE index access_token_index(access_token);
 
 
+-- 2019-6-3  JSON_EXTRACT 提取json中对应的值，json_contains	判断是否包含某个json值
+select *
+, JSON_CONTAINS(qualifications->'$[*].qualificationTwoLabel', '"甲级"', '$') jsonContains
+
+from (
+select id, qualification_info, 
+replace(replace(replace(JSON_EXTRACT(qualification_info, '$.qualifications'),'\\', '') ,'"[', '[' ), ']"', ']') qualifications 
+from (
+select c.id, c.company_name, c.user_id, c.province_id, c.city_id, c.authenticate_status,
+			q.qualification_belong, group_concat(q.qualification_type) qualificationTypes,
+			(select qualification_info from lz_qualification where user_id = q.user_id and qualification_type = 1) qualification_info, 
+			group_concat(if(q.qualification_type != 1 and q.qualification_type != 0, q.qualification_name, null)) qualificationNames,
+			group_concat(if(q.qualification_type != 1 and q.qualification_type != 0, null, q.qualification_name)) companyAuthNames,
+			group_concat(if(q.qualification_type != 1 and q.qualification_type != 0, null, q.qualification_type)) companyAuthTypes
+		from lz_companys c 
+			join lz_qualification q on q.user_id = c.user_id
+		where c.company_status = 1 and c.authenticate_status = 2 and q.authenticate_status = 2
+			and q.qualification_belong = 1 
+
+				and c.company_name like concat('%', 'test-A的企业认证', '%')
+
+			group by c.id
+			) detail ) result  where JSON_CONTAINS(qualifications->'$[*].qualificationOne', concat('"', '1', '"'), '$')  
+			and JSON_CONTAINS(qualifications->'$[*].qualificationTwo', concat('"', '1', '"'), '$') 
 
 
 

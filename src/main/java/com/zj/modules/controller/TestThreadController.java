@@ -21,6 +21,12 @@ import com.zj.modules.service.TestThreadPool;
 @RestController
 @RequestMapping("/test")
 public class TestThreadController {
+	
+	//再换一种
+//	new Thread(new Runnable() {
+//	    public void run() {
+//	    }
+//	}).start();
 
 	@RequestMapping("/moreThread")
 	public static Object moreThread() {

@@ -9,7 +9,7 @@ import javax.servlet.DispatcherType;
 /**
  * Filter配置
  *
- * @author zhangqh
+ * @author zhouzhenjiang
  * @date 2017年9月23日
  */
 @Configuration

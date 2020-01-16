@@ -1,18 +1,126 @@
-JRebel �Ȳ���
-https://blog.csdn.net/weixin_42245930/article/details/83443287
 
-Swagger ��https://blog.csdn.net/sanyaoxu_2/article/details/80555328��
-��һ���淶�������Ŀ�ܣ��������ɡ����������úͿ��ӻ� RESTful ���� Web ��������Ŀ����ʹ�ͻ��˺��ļ�ϵͳ��Ϊ��������ͬ�����ٶ������¡��ļ��ķ�����������ģ�ͽ��ܼ��ɵ��������˵Ĵ��룬����API��ʼ�ձ���ͬ����
+框架等：
+Swagger （https://blog.csdn.net/sanyaoxu_2/article/details/80555328）
+是一个规范和完整的框架，用于生成、描述、调用和可视化 RESTful 风格的 Web 服务。总体目标是使客户端和文件系统作为服务器以同样的速度来更新。文件的方法，参数和模型紧密集成到服务器端的代码，允许API来始终保持同步。
 
 mybatis-plus 
 
-mapstruct ����ת��
+mapstruct 对象转换
 
-spring cloud gateway ����
+spring cloud gateway 网关
 
-spring cloud activiti ������
+spring cloud activiti 工作流
 
-activiti-modeler ������ģ�������
+activiti-modeler 工作流模板设计器
 
-Spring Cloud ����ʽ������� Feign
-Feign��RestTemplate�Ļ����϶����װ���������������Ƕ����ʵ����������ӿڵĶ��塣
+Spring Cloud 声明式服务调用 Feign
+Feign在RestTemplate的基础上对其封装，由它来帮助我们定义和实现依赖服务接口的定义。
+
+
+
+
+eclipse 常用的插件
+JRebel 热部署
+https://blog.csdn.net/weixin_42245930/article/details/83443287
+
+MyBatipse插件    MyBatipse是Eclipse的一个插件，提供了内容提示和Mybatis的配置文件验证功能及跳转至XML等功能
+https://github.com/mybatis/mybatipse
+
+lombok工具插件 （@Data,）
+提供了简单的注解的形式来帮助我们简化消除一些必须有但显得很臃肿的 java 代码。通过使用对应的注解，可以在编译源码的时候生成对应的方法，所以不会影响任何运行效率。
+<dependency>    
+    <groupId>org.projectlombok</groupId>    
+    <artifactId>lombok</artifactId>
+</dependency>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+idea 常用插件
+1、Free-idea-mybatis
+
+mybatis xml和对应的mapper之间来回切换的时候，有时候不同人开发，放置的位置又不同，使用此插件后，来回切换的时候异常方便，和所放置的位置无关~
+
+
+2、Grep Console
+由于Intellij idea不支持显示ascii颜色，grep-console插件能很好的解决这个问题， 可以设置不同级别log的字体颜色和背景色.
+
+3、Mybatis Log Plugin
+Mybatis现在是java中操作数据库的首选，在开发的时候，我们都会把Mybatis的脚本直接输出在console中，
+但是默认的情况下，输出的脚本不是一个可以直接执行的。
+如果我们想直接执行，还需要在手动转化一下，比较麻烦。
+MyBatis Log Plugin 这款插件是直接将Mybatis执行的sql脚本显示出来，无需处理，可以直接复制出来执行的 。
+Tools -- >  Mybatis Log Plugin  打开其日志框，注意其转换的SQL不是输出到IDE的控制台!
+
+4、Jrebel
+是一款比较常见的热部署插件，一般用于Run模式下的自动编译，破译版本
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+eclipse 常用的快捷键
+
+ALT + 上下键                     移动代码位置
+Ctrl + f                               查找当前所在文件的内容 关键词
+Ctrl + Shift + f                    格式化选中的代码
+Ctrl + Alt + H                      点中具体的方法，查看其引用
+Ctrl + H                              全局搜索关键字
+Ctrl + Shift + H/T                全局搜索文件
+Ctrl + Shift + O                   java页面一键导包及去除无用包
+Ctrl + O                              查找当前文件夹里面的方法 及定义的属性名
+Ctrl + D                              删除行
+Ctrl + /                               代码注释、或取消注 释
+Alt + /                                 代码提示
+
+
+
+idea 快捷键
+
+Ctrl + f                           查找当前所在文件的内容 关键词
+Ctrl + Shift + F               全局搜索 关键词
+Ctrl + Alt + O                  java页面一键导包及去除无用包及排序包
+Ctrl + 左键                      进入方法（service）
+Ctrl + Alt + 左键              进入实现类
+Shirft + ESC                   隐藏控制台
+Ctrl + Alt + H                  点中具体的方法，查看其引用
+Ctrl + F12                      查找当前类的方法及定义的属性
+Ctrl + G                          搜索java文件所在行位置
+Ctrl + Y                           删除行
+Ctrl + N                           查找类
+Ctrl + Shift + L                 格式化选中代码
+Ctrl + Shirft + 上下键       上下移动代码
+Ctrl + z                            撤销
+Ctrl + Shirft + Z               取消撤销的操作
+Ctrl + O                           查找我们继承的类活接口中的方法，以及我们要实现的方法
+
+
+
