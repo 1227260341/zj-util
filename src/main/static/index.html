@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+        <link rel="shortcut icon" type="image/x-icon" href="/static/favicon.ico">
+        <title>支付分平台支付</title>
+        <style>
+           
+        </style>
+    </head>
+    <body>
+        <div id="appPageLoading" class="app-page-loader">
+            <div class="page-loader-inner loader-ball-pulse">
+                <div>index</div>
+                <div><img alt="aa" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAIAAADdBSngAAAEkUlEQVR42u3aS47jMBBEQd//0p4D9GZgqDJLZHAtWB8GvXioz6e6vn/Wb9c8dff/Wd23+O0J537n2IUmmmiiiSaaaKKJJppoormSy1MruWHd49TFkTxgczbQRBNNNNFEE0000UQTTTTRTHIpv+pD796lMPcW6/5K0EQTTTTRRBNNNNFEE0000QzSTCaeOfT7jxOaaKKJJppoookmmmiiiSaaaO4JKMmhkO4XQxNNNNFEE0000UQTTTTRRPMMmnMjF3M0u6S6YyLJ/YqO46CJJppoookmmmiiiSaaaF5G89Rc4pp3pTQ0XYMmmmii6Ro00UQTTdfcRvN7xHrqQ+8fJUkOxJT3FE000UQTTTTRRBNNNNFEE82xF0sORiQBnfruyeP0WDxCE0000UQTTTTRRBNNNNE8mmZ3mKN7VLqjLWc84Y/G0EQTTTTRRBNNNNFEE0000aymkLnP2g06cyGmO1wyuO9oookmmmiiiSaaaKKJJprX00yGoW3PPLfxp9IczFtoookmmmiiiSaaaKKJJppoXgOxG4/mQkw3XQ2Od6CJJppoookmmmiiiSaaaB5NM5lU5gY+5hLP3CHcH3SiwxxoookmmmiiiSaaaKKJJprX05wLFnN3757daC4JHsJtotBEE0000UQTTTTRRBNNNG+jmfxA3fGFuTBU3oxlgSkZztBEE0000UQTTTTRRBNNNG+j2Y0jc7GmG862/QW88uiiiSaaaKKJJppoookmmmgeRDM5rJD8iHPITkW/bt/RRBNNNNFEE0000UQTTTTRPDRYJDf1jABXDotoookmmmiiiSaaaKKJJpqX0exGn+69kui7yemN6NFEE0000UQTTTTRRBNNNNH8jq25gYZk0Nl2UJMHo/s10EQTTTTRRBNNNNFEE000z6a5PwzN3X1uKCR5r27+GwyCaKKJJppoookmmmiiiSaaaFaTQbSTHbqp3cD0WOxDE0000UQTTTTRRBNNNNG8jGZydXPJ3CjJHMRyvqkO36CJJppoookmmmiiiSaaaKKZRLYfRzKpdPNWcnde8P+HJppoookmmmiiiSaaaKIZp9l96G3DE29scvsPBppoookmmmiiiSaaaKKJJprdGNG95o3DCvujT3kv0EQTTTTRRBNNNNFEE000j6bZHbCYG03YRrwbqpJP+NieookmmmiiiSaaaKKJJppoXkYz+WL7A0p3DCIZvPa/KZpoookmmmiiiSaaaKKJ5m00v8tW8mAk08y2VJQ8PI+Nd6CJJppoookmmmiiiSaaaB5N841JZS4w7T9O3fyXHAFBE0000UQTTTTRRBNNNNFEsxuG5gLKNohnPGE0k6GJJppoookmmmiiiSaaaF5PMxksusS7keVzxBp8LzTRRBNNNNFEE0000UQTTTTXjxR0Y00SWRL9uiyFJppoookmmmiiiSaaaKKJ5gvj0RzWZC6ZC2f7DxiaaKKJJppoookmmmiiiSaayaSShDj3WZNfY47UC44ummiiiSaaaKKJJppooonmZTSTqxs+kh96G9buMUATTTTRRBNNNNFEE0000UTzz/oHep6Dzv1/mu8AAAAASUVORK5CYII="></div>
+                <div></div>
+            </div>
+        </div>
+        <div id="app"></div>
+        <!-- built files will be auto injected -->
+        
+        <script>
+		    //alert("index");
+		    let domT = document.querySelector('#app');
+		    var ua = window.navigator.userAgent.toLowerCase();
+		    //alert(ua);
+		    if ( ua.indexOf('micromessenger') > -1 ) {  
+			    domT.innerHTML =  'wechatClient';
+			    alert("这是微信哈");
+			    location.href = "https://open.weixin.qq.com/";
+			  } else if (ua.indexOf('alipayclient') > -1) {
+			    domT.innerHTML =  'aliClient';
+			    alert("这是支付宝哈");
+			    location.href = "https://open.alipay.com/platform/home.htm";
+			  } else {
+			  	domT.innerHTML =  'unknown';
+			  	alert("这是buzhid");
+			  }
+		  /* if ( ua.match(/MicroMessenger/i) === 'micromessenger' ) {  
+		    domT.innerHTML =  'wechatClient';
+		  } else if (ua.match(/AlipayClient/i) === 'alipayclient') {
+		    domT.innerHTML =  'aliClient';
+		  } else {
+		  	domT.innerHTML =  'unknown';
+		  } */
+		    
+		</script>
+    </body>
+    
+</html>
