@@ -1,5 +1,5 @@
 server:
-  port: 6666
+  port: 9999
 spring:
   application:
     name: util
@@ -18,6 +18,29 @@ mybatis:
   type-aliases-package: com.zj.modules.domain
   type-handlers-package: com.zj.modules.mapper
   mapper-locations: classpath:com.zj.modules.mapper/*.xml
+  
+  
+#test 支付配置
+#payment.wx.useSandbox=false
+#payment.wx.notifyUrl=http://21742pa841.51mypc.cn:46064/lz/om/payment/wx/syncNotify
+#payment.wx.certPath=/home/certs/
+#
+#payment.alipay.gatewayUrl=https://openapi.alipaydev.com/gateway.do
+#payment.alipay.charset=utf-8
+#payment.alipay.signType=RSA2
+#payment.alipay.notifyUrl=http://21742pa841.51mypc.cn:46064/lz/om/payment/alipay/syncNotify
+#payment.alipay.returnUrl=http://192.168.2.198:7777/service-center/my-order
+
+#product
+#payment.wx.UseSandbox=false
+#payment.wx.notifyUrl=http://21742pa841.51mypc.cn:46064/lz/om/payment/wx/syncNotify
+#payment.wx.certPath=/home/certs/
+
+#payment.alipay.gatewayUrl=https://openapi.alipay.com/gateway.do
+#payment.alipay.charset=utf-8
+#payment.alipay.signType=RSA2-
+#payment.alipay.notifyUrl=http://21742pa841.51mypc.cn:46064/lz/om/payment/alipay/syncNotify
+#payment.alipay.returnUrl=http://192.168.1.230:7777/service-center/my-order
     
     
     
