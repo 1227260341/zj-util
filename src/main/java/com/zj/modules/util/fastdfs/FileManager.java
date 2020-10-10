@@ -56,7 +56,8 @@ public class FileManager  {
 //            ClientGlobal.init(fdfsClientConfigFilePath);
 
             trackerClient = new TrackerClient();
-            trackerServer = trackerClient.getConnection();
+//            trackerServer = trackerClient.getConnection();
+            trackerServer = trackerClient.getTrackerServer();
 
             storageClient = new StorageClient(trackerServer, storageServer);
 

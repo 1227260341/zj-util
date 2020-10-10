@@ -2,8 +2,10 @@ package com.zj.modules.util;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -25,6 +27,9 @@ import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.tomcat.util.http.fileupload.FileItem;
+import org.apache.tomcat.util.http.fileupload.FileItemFactory;
+import org.apache.tomcat.util.http.fileupload.disk.DiskFileItemFactory;
 import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson.JSON;
@@ -536,6 +541,44 @@ public class BaseUtil {
 			}
 		}
     	return params;
+    }
+    
+    
+    /**
+     * 创建FileItem 将file 转换成FileItem
+     * 如 需要将其转换成  MultipartFile 则 MultipartFile multipartFile = new CommonsMultipartFile(fileItem);即可
+     * @param file  需要转换的文件
+     * @param fileName 文件名
+     * @return FileItem
+     */
+    public FileItem createFileItem(File file, String fileName)
+    {
+        String filePath = file.getPath();
+        FileItemFactory factory = new DiskFileItemFactory(16, null);
+        String textFieldName = "file";
+        int num = filePath.lastIndexOf(".");
+        String extFile = filePath.substring(num);
+        FileItem item = factory.createItem(textFieldName, "multipart/form-data", true,
+                fileName);
+        int bytesRead = 0;
+        byte[] buffer = new byte[8192];
+        try
+        {
+            FileInputStream fis = new FileInputStream(file);
+            OutputStream os = item.getOutputStream();
+            while ((bytesRead = fis.read(buffer, 0, 8192))
+                != -1)
+            {
+                os.write(buffer, 0, bytesRead);
+            }
+            os.close();
+            fis.close();
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+        return item;
     }
     
 	
