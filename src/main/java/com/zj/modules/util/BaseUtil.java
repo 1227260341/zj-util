@@ -545,17 +545,27 @@ public class BaseUtil {
     
     
     /**
-     * 创建FileItem 将file 转换成FileItem
-     * 如 需要将其转换成  MultipartFile 则 MultipartFile multipartFile = new CommonsMultipartFile(fileItem);即可
-     * @param file  需要转换的文件
-     * @param fileName 文件名
-     * @return FileItem
+     * 将file 文件转换成FileItem 文件 便于转换成  MultipartFile 文件，转换成MultipartFile 文件方式如下：
+     * FileItem fileItem = createFileItem(file, fileName);
+       MultipartFile multipartFile = new CommonsMultipartFile(fileItem);
+       
+       需要的jar:
+  	<dependency>
+  		<groupId>commons-fileupload</groupId>
+  		<artifactId>commons-fileupload</artifactId>
+  		<version>1.4</version>
+  	</dependency>
+     * @version 2021-1-2810:43:18
+     * @author zhouzj
+     * @param file
+     * @param fileName
+     * @return
      */
-    public FileItem createFileItem(File file, String fileName)
+    public static FileItem createFileItem(File file, String fileName)
     {
         String filePath = file.getPath();
         FileItemFactory factory = new DiskFileItemFactory(16, null);
-        String textFieldName = "file";
+        String textFieldName = "file";//这个必须与 MultipartFile 传输的 是一致的 如feign 调用   @RequestPart("file") MultipartFile file
         int num = filePath.lastIndexOf(".");
         String extFile = filePath.substring(num);
         FileItem item = factory.createItem(textFieldName, "multipart/form-data", true,
