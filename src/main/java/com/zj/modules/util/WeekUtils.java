@@ -20,7 +20,7 @@ public class WeekUtils {
 	        
 	    	WeekUtils cd = new WeekUtils();
 	        System.out.println("开始时间: " + cd.getStartDayOfWeekNo(2015,47) );
-	        System.out.println("结束时间:" + cd.getEndDayOfWeekNo(2015,47) );    
+	        System.out.println("结束时间:" + cd.getEndDayOfWeekNo(2015,48) );    
 	        
 	    }
 	    

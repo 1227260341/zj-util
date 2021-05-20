@@ -1,8 +1,11 @@
 package com.zj.modules.util;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -17,24 +20,32 @@ import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.tomcat.util.http.fileupload.FileItem;
 import org.apache.tomcat.util.http.fileupload.FileItemFactory;
 import org.apache.tomcat.util.http.fileupload.disk.DiskFileItemFactory;
 import org.springframework.util.StringUtils;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import cn.afterturn.easypoi.excel.ExcelExportUtil;
+import cn.afterturn.easypoi.excel.entity.ExportParams;
+import cn.afterturn.easypoi.excel.entity.params.ExcelExportEntity;
 
 
 /**
@@ -591,5 +602,433 @@ public class BaseUtil {
         return item;
     }
     
+    /**
+	 * easypoi 导出excel
+	 * zj
+	 * 2018年8月22日
+	 * @throws Exception 
+	 */
+	public static void easypoiDownloadExcel(List<ExcelExportEntity> colList, List<Map<String, Object>> dataList, 
+			String excelName, String schoolId, HttpServletResponse response) {
+		
+		try {
+			ExportParams exportParams = new ExportParams(excelName, "数据");
+			exportParams.setStyle(ExcelExportStylerDefaultImpl.class);//设置表头样式
+			Workbook workbook = ExcelExportUtil.exportExcel(exportParams, colList,
+					dataList);
+			if (PropertiesUtil.isEmptyString(schoolId)) {
+				schoolId = "暂无";
+			}
+			String fileName = excelName+".xls";
+//	    String tFilePath = Thread.currentThread().getContextClassLoader().getResource("").getPath();
+//	    tFilePath = tFilePath.substring(0, tFilePath.indexOf("/WEB-INF/"));
+			String tFilePath = getDemoPath(schoolId);
+			tFilePath = tFilePath + "/" + fileName;
+			System.out.println("存储路径-----------：" + tFilePath);
+			
+			FileOutputStream fos = new FileOutputStream(tFilePath);
+			workbook.write(fos);
+			fos.close();
+			
+			InputStream is = new FileInputStream(new File(tFilePath));
+			// 设置response参数，可以打开下载页面
+			response.reset();
+			response.setContentType("application/vnd.ms-excel;charset=utf-8");
+			response.setHeader("Content-Disposition", "attachment;filename=" + new String((fileName).getBytes(), "iso-8859-1"));
+			ServletOutputStream out = response.getOutputStream();
+			BufferedInputStream bis = null;
+			BufferedOutputStream bos = null;
+			try {
+			    bis = new BufferedInputStream(is);
+			    bos = new BufferedOutputStream(out);
+			    byte[] buff = new byte[2048];
+			    int bytesRead;
+			    // Simple read/write loop.
+			    while (-1 != (bytesRead = bis.read(buff, 0, buff.length))) {
+			    	bos.write(buff, 0, bytesRead);
+			    }
+			} catch (final IOException e) {
+			    throw e;
+			} finally {
+			    if (bis != null)
+				bis.close();
+			    if (bos != null)
+				bos.close();
+			    File tFile = new File(tFilePath);
+			    tFile.deleteOnExit();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static Map easypoiDownloadExcel1(List<ExcelExportEntity> colList, List<Map<String, Object>> dataList, 
+			String excelName, String schoolId, HttpServletResponse response) {
+		
+		try {
+			Map resultMap = new HashMap<>();
+			ExportParams exportParams = new ExportParams(excelName, "数据");
+			exportParams.setStyle(ExcelExportStylerDefaultImpl.class);//设置表头样式
+			Workbook workbook = ExcelExportUtil.exportExcel(exportParams, colList,
+					dataList);
+			if (PropertiesUtil.isEmptyString(schoolId)) {
+				schoolId = "暂无";
+			}
+			String fileName = excelName+".xls";
+//	    String tFilePath = Thread.currentThread().getContextClassLoader().getResource("").getPath();
+//	    tFilePath = tFilePath.substring(0, tFilePath.indexOf("/WEB-INF/"));
+			String tFilePath = getDemoPath(schoolId);
+			tFilePath = tFilePath + "/" + fileName;
+			System.out.println("存储路径-----------：" + tFilePath);
+			
+			FileOutputStream fos = new FileOutputStream(tFilePath);
+			workbook.write(fos);
+			fos.close();
+			
+			resultMap.put("downloadResult", true);
+			resultMap.put("fileName", fileName);
+			resultMap.put("filePath", tFilePath);
+			return resultMap;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	/**
+	 * poi 导出excel
+	 * zj
+	 * 2018年8月24日
+	 */
+	public static void poiDownloadExcel(ArrayList<String> titleDefine, ArrayList<ArrayList<Object>> datas, 
+			String excelName, String schoolId, List<CellRangeAddress> CRAs, HttpServletResponse response) {
+		
+		try {
+			if (PropertiesUtil.isEmptyString(schoolId)) {
+				schoolId = "暂无";
+			}
+			String fileName = excelName+".xls";
+			//获取工程目录
+			String tFilePath = getDemoPath(schoolId);
+			tFilePath = tFilePath + "/" + fileName;
+			System.out.println("存储路径-----------：" + tFilePath);
+			
+			if (PoiExportUtil.export(tFilePath, "Sheet1", titleDefine, datas, CRAs)) {
+		    	
+		    	//sheet.addMergedRegion(new CellRangeAddress(0,0,4,0));
+		    	
+				InputStream is = new FileInputStream(new File(tFilePath));
+				// 设置response参数，可以打开下载页面
+				response.reset();
+				response.setContentType("application/vnd.ms-excel;charset=utf-8");
+				response.setHeader("Content-Disposition", "attachment;filename=" + new String((fileName).getBytes(), "iso-8859-1"));
+				ServletOutputStream out = response.getOutputStream();
+				BufferedInputStream bis = null;
+				BufferedOutputStream bos = null;
+				try {
+				    bis = new BufferedInputStream(is);
+				    bos = new BufferedOutputStream(out);
+				    byte[] buff = new byte[2048];
+				    int bytesRead;
+				    // Simple read/write loop.
+				    while (-1 != (bytesRead = bis.read(buff, 0, buff.length))) {
+					bos.write(buff, 0, bytesRead);
+				    }
+				} catch (final IOException e) {
+				    throw e;
+				} finally {
+				    if (bis != null)
+					bis.close();
+				    if (bos != null)
+					bos.close();
+				    File tFile = new File(tFilePath);
+				    tFile.deleteOnExit();
+				}
+		    }
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * 下载报表， 此处指返回 生成报表的结果（未进行下载功能）
+	 * zj
+	 * 2018年12月14日
+	 */
+	public static Map poiDownloadExcel1(ArrayList<String> titleDefine, ArrayList<ArrayList<Object>> datas, 
+			String excelName, String schoolId, List<CellRangeAddress> CRAs, HttpServletResponse response) {
+		Map resultMap = new HashMap<>();
+		try {
+			if (PropertiesUtil.isEmptyString(schoolId)) {
+				schoolId = "暂无";
+			}
+			String fileName = excelName+".xls";
+			//获取工程目录
+			String tFilePath = getDemoPath(schoolId);
+			tFilePath = tFilePath + "/" + fileName;
+			System.out.println("存储路径-----------：" + tFilePath);
+			Boolean downloadResult = PoiExportUtil.export(tFilePath, "Sheet1", titleDefine, datas, CRAs);
+			resultMap.put("downloadResult", downloadResult);
+			resultMap.put("fileName", fileName);
+			resultMap.put("filePath", tFilePath);
+			return resultMap;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	/**
+	 * 获取工程excle储存地址
+	 * zj
+	 * 2018年8月31日
+	 */
+	public static String getDemoPath(String folderName) {
+		String tFilePath = System.getProperty("user.dir");
+		LogUtils.info("user.dir path=" + tFilePath);
+		if (PropertiesUtil.isEmptyString(tFilePath) || "/".equals(tFilePath)) {
+			HttpServletRequest request = getRequestAttributes().getRequest();
+			String realPath = request.getSession().getServletContext().getRealPath("/");
+			tFilePath = realPath;
+			LogUtils.info("getRealPath path=" + tFilePath);
+		}
+		tFilePath = tFilePath.replaceAll("\\\\", "/");
+		tFilePath = tFilePath + "/temp/" + folderName;
+		File file = new File(tFilePath);
+		if (!file.exists()) {//不存在文件夹 则进行创建
+			file.mkdirs();
+		}
+		
+		return tFilePath; 
+	}
+    
+	
+	/**
+	 * 获取 RequestAttributes
+	 * zj
+	 * 2018年8月31日
+	 */
+	public static ServletRequestAttributes getRequestAttributes() {
+		ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes)RequestContextHolder.getRequestAttributes();
+		return servletRequestAttributes;
+	}
+	
+	
+	/**
+     * 下载质量分析表（实例）
+     * zj
+     * 2018年8月23日
+     * @throws Exception 
+     */
+    public Map downloadQualityAnalysis(Map returnMap, HttpServletResponse response, String schoolId) throws Exception {
+    	
+    	if (returnMap.get("code") == null || (int)returnMap.get("code") != 0 || returnMap.get("data") == null) {
+    		return null;
+    	}
+    	String titleName = (String) returnMap.get("titleName");
+    	Map returnData = (Map) returnMap.get("data");
+    	List<Map> gradeData = (List<Map>) returnData.get("gradeData");
+    	List<Map> subjectCount = (List<Map>) returnData.get("subjectCount");
+    	int gradeDataSize = gradeData.size();
+    	
+    	ArrayList<String> titleDefine = new ArrayList<String>();
+ 	    ArrayList<Object> rowList = new ArrayList<Object>();
+ 	    ArrayList<ArrayList<Object>> datas = new ArrayList<ArrayList<Object>>();
+ 	    
+ 	    //一表头
+ 	    rowList.add(titleName);
+ 	    rowList.add("");
+ 	    rowList.add("");
+ 	    rowList.add("");
+ 	    rowList.add("");
+	 	rowList.add("");
+	 	rowList.add("");
+	 	rowList.add("");
+	 	for (int i = 0; i < gradeDataSize; i ++) {
+	 		rowList.add("");
+	 		rowList.add("");
+	 	}
+	 	datas.add(rowList);
+ 	    
+ 	    //二表头
+	 	rowList = new ArrayList<Object>();
+ 	    rowList.add("班级");
+ 	    rowList.add("人数");
+ 	    rowList.add("");
+ 	    rowList.add("分数");
+ 	    rowList.add("");
+	 	rowList.add("");
+	 	rowList.add("");
+	 	rowList.add("标准差");
+	 	for (int i = 0; i < gradeDataSize; i ++) {
+	 		if (i == 0) {
+	 			rowList.add("等级");
+	 			rowList.add("");
+	 			continue ;
+	 		}
+	 		rowList.add("");
+	 		rowList.add("");
+	 	}
+	 	datas.add(rowList);
+	 	
+	 	//三表头
+	 	rowList = new ArrayList<Object>();
+	 	rowList.add("");
+	 	rowList.add("");
+	 	rowList.add("");
+	 	rowList.add("");
+	 	rowList.add("");
+	 	rowList.add("");
+	 	rowList.add("");
+	 	rowList.add("");
+	 	for (int i = 0; i < gradeDataSize; i ++) {
+	 		Map gradeMap = gradeData.get(i);
+	 		rowList.add(gradeMap.get("gradeName"));
+	 		rowList.add("");
+	 	}
+	 	datas.add(rowList);
+	 	
+	 	//三表头
+	 	rowList = new ArrayList<Object>();
+	 	rowList.add("");
+	 	rowList.add("实考");
+	 	rowList.add("缺考");
+	 	rowList.add("平均分");
+	 	rowList.add("离均差");
+	 	rowList.add("最高分");
+	 	rowList.add("最低分");
+	 	rowList.add("");
+	 	for (int i = 0; i < gradeDataSize; i ++) {
+	 		rowList.add("人数");
+	 		rowList.add("比率");
+	 	}
+	 	datas.add(rowList);
+	 	
+	 	//数据绑定
+	 	if (PropertiesUtil.verifyList(subjectCount)) {
+	 		for (int i = 0; i < subjectCount.size(); i ++) {
+	 			Map countMap = subjectCount.get(i);
+	 			rowList = new ArrayList<Object>();
+	 			rowList.add(countMap.get("className"));
+	 			rowList.add(countMap.get("examNum"));
+	 			rowList.add(countMap.get("missNum"));
+	 			rowList.add(countMap.get("classAvg"));
+	 			rowList.add(countMap.get("leaveAvgRate"));
+	 			rowList.add(countMap.get("classMax"));
+	 			rowList.add(countMap.get("classMin"));
+	 			rowList.add(countMap.get("standdardDeviation"));
+	 			for (int j = 0; j < gradeDataSize; j ++) {
+	 		 		Map gradeMap = gradeData.get(j);
+	 		 		Object gradeId = gradeMap.get("gradeId");
+	 		 		rowList.add(countMap.get(gradeId + "_num"));
+	 		 		rowList.add(countMap.get(gradeId + "_rate") + "%");
+	 		 	}
+	 			datas.add(rowList);
+	 		}
+	 	}
+	 	
+	 	
+	    //设置合并行
+	    List<CellRangeAddress> CRAs = new ArrayList<>();
+	    CRAs.add(new CellRangeAddress(0, 0, 0, 8 + gradeDataSize*2 -1));
+	    CRAs.add(new CellRangeAddress(1, 3, 0, 0));
+	    CRAs.add(new CellRangeAddress(1, 2, 1, 2));
+	    CRAs.add(new CellRangeAddress(1, 2, 3, 6));
+	    CRAs.add(new CellRangeAddress(1, 3, 7, 7));
+	    CRAs.add(new CellRangeAddress(1, 1, 8, 8 + gradeDataSize*2 -1));
+	    for (int j = 0; j < gradeDataSize; j ++) {
+	    	int lastColumn = 8 + j*2 + 1;
+	    	CRAs.add(new CellRangeAddress(2, 2, 8 + j*2 , lastColumn));
+	    }
+	    /*CRAs.add(new CellRangeAddress(0, 2, 0, 0));
+	    CRAs.add(new CellRangeAddress(0, 1, 1, 2));
+	    CRAs.add(new CellRangeAddress(0, 1, 3, 6));
+	    CRAs.add(new CellRangeAddress(0, 2, 7, 7));
+	    CRAs.add(new CellRangeAddress(0, 0, 8, 8 + gradeDataSize*2 -1));
+	    for (int j = 0; j < gradeDataSize; j ++) {
+	    	int lastColumn = 8 + j*2 + 1;
+	    	CRAs.add(new CellRangeAddress(1, 1, 8 + j*2 , lastColumn));
+	    }*/
+	    PoiExportUtil.columnWidth = 9*256;//设置生成的表格宽度
+	    Map<Integer, Integer> columnWidthMap = new HashMap<>();
+	    columnWidthMap.put(0, 15*256);
+	    PoiExportUtil.columnWidthMap = columnWidthMap;
+	    Map resultMap = this.poiDownloadExcel1(titleDefine, datas, titleName, schoolId, CRAs, response);
+	    return resultMap;
+    }
+    
+    
+    /**
+     * 单科名次分布表(实例)
+     * zj
+     * 2018年8月23日
+     */
+//    public Map downloadRankSpread2(Map returnMap, HttpServletResponse response, String schoolId) {
+//    	
+//    	if (returnMap.get("code") == null || (int)returnMap.get("code") != 0 || returnMap.get("data") == null) {
+//    		return null;
+//    	}
+//    	
+//    	String titleName = (String) returnMap.get("titleName");
+//    	List<Map> dataMap = (List<Map>) returnMap.get("data");
+//    	List<ReportSet> tableHead = (List<ReportSet>) returnMap.get("tableHead");
+//    	
+//    	List<ExcelExportEntity> colList = new ArrayList<ExcelExportEntity>();
+//    	colList.add(new ExcelExportEntity("班级", "className"));
+//    	
+//    	ExcelExportEntity memberEEE = new ExcelExportEntity("人数", "member");
+//    	List<ExcelExportEntity> memberEEEList = new ArrayList<ExcelExportEntity>();
+//    	memberEEEList.add(new ExcelExportEntity("实考", "realExam"));
+//    	memberEEEList.add(new ExcelExportEntity("缺考", "missExam"));
+//    	memberEEE.setList(memberEEEList);
+//    	colList.add(memberEEE);
+//    	
+//    	colList.add(new ExcelExportEntity("T值", "tValue"));
+//    	
+//    	for (ReportSet item : tableHead) {
+//    		Integer id = item.getId();
+//    		String name = item.getName();
+//    		ExcelExportEntity itemEEE = new ExcelExportEntity(name, id + "_item");
+//        	List<ExcelExportEntity> itemEEEList = new ArrayList<ExcelExportEntity>();
+//        	itemEEEList.add(new ExcelExportEntity("人数", id + "_num"));
+//        	itemEEEList.add(new ExcelExportEntity("比率", id + "_rate"));
+//        	//goodEEEList.add(new ExcelExportEntity("排名", "beforeTenRank"));
+//        	itemEEE.setList(itemEEEList);
+//        	colList.add(itemEEE);
+//    	}
+//    	
+//    	//渲染数据
+//    	List<Map<String, Object>> dataList = new ArrayList<Map<String, Object>>();
+//    	for (int i = 0; i < dataMap.size(); i++) {
+//    		Map subjectCountMap = (Map) dataMap.get(i);
+//    		Object className = subjectCountMap.get("className");
+//    		
+//    		Map valMap = new HashMap();
+//            valMap.put("className", className);
+//            
+//            List<Map> classMember = new ArrayList<Map>();
+//            Map classMemberMap = new HashMap();
+//            classMemberMap.put("realExam", subjectCountMap.get("examNum"));
+//            classMemberMap.put("missExam", subjectCountMap.get("missNum"));
+//            classMember.add(classMemberMap);
+//            valMap.put("member", classMember);
+//            
+//            valMap.put("tValue", subjectCountMap.get("tValue"));
+//            for (ReportSet item : tableHead) {
+//            	Integer id = item.getId();
+//            	List<Map> itemList = new ArrayList<Map>();
+//                Map itemMap = new HashMap();
+//                itemMap.put(id + "_num", subjectCountMap.get(id + "_num"));
+//                itemMap.put(id + "_rate", subjectCountMap.get(id + "_rate"));
+//                itemList.add(itemMap);
+//                valMap.put(id + "_item", itemList);
+//            }
+//            dataList.add(valMap);
+//    	}
+//    	
+//    	Map resultMap = BaseUtil.easypoiDownloadExcel1(colList, dataList, titleName, schoolId, response);
+//    	return resultMap;
+//    }
 	
 }

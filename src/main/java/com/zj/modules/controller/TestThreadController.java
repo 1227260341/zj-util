@@ -3,6 +3,7 @@ package com.zj.modules.controller;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.tomcat.util.threads.ThreadPoolExecutor;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -99,6 +100,20 @@ public class TestThreadController {
 //		moreThreadParam();
 		moreThreadPool();
 //		System.exit(0);
+		
+		
+		
+		
+		AtomicInteger a = new AtomicInteger(1);
+        System.out.println(a.incrementAndGet());
+        System.out.println(a.incrementAndGet());
+        System.out.println(a.incrementAndGet());
+        System.out.println(a.incrementAndGet());
+        System.out.println(1);
+		
+		
+		
+		
 	}
 	
 }
