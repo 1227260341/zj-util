@@ -15,6 +15,11 @@ import javax.xml.bind.annotation.XmlElement;
 
 import com.zj.modules.payment.entity.ServOrder;
 
+/**
+ * 根据实体生成对应的 表
+ * @author zzj
+ *
+ */
 public class GenerateSqlFromEntityUtil {
 
 	public static void main(String[] a) {

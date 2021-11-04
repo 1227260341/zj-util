@@ -330,6 +330,38 @@ public class BaseUtil {
 	}
 	
 	/**
+     * 判断对象中是否存在未空的属性
+     * @version 2021-7-2217:58:31
+     * @author zhouzj
+     * @param obj 需要验证的对象  ignoreAttribute需要忽略的属性名，多个逗号分隔
+     * @return
+     * @throws IllegalAccessException
+     */
+    public static boolean checkObjFieldIsNull(Object obj, String ignoreAttributes) {
+
+        try {
+			boolean flag = false;
+			for(Field f : obj.getClass().getDeclaredFields()){
+			    f.setAccessible(true);
+//            log.info(f.getName());
+			    String name = f.getName();
+			    Object object = f.get(obj);
+			    if (!StringUtils.isEmpty(ignoreAttributes) && ignoreAttributes.contains(name)) {
+			    	continue ;
+			    }
+			    if(f.get(obj) == null){
+			        flag = true;
+			        return flag;
+			    }
+			}
+			return flag;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+        return false;
+    }
+	
+	/**
 	 * 获取 RequestAttributes
 	 * zj
 	 * 2018年8月31日
@@ -393,6 +425,34 @@ public class BaseUtil {
         String num = prefix + milli + last;
 		return num;
 	}
+	
+	/**
+     * 生成随机字数字
+     * @version 2021-7-2711:14:26
+     * @author zhouzj
+     * @param position
+     * @return
+     */
+    public static String getRandomNo(Integer position) {
+    	if (position == null) {
+    		position = 6;	
+    	}
+        String linkNo = "";
+        // 用字符数组的方式随机
+//        String model = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        String model = "0123456789";
+        char[] m = model.toCharArray();
+        for (int j = 0; j < position; j++) {
+            char c = m[(int) (Math.random() * 10)];
+            // 保证六位随机数之间没有重复的
+//            if (linkNo.contains(String.valueOf(c))) {
+//                j--;
+//                continue;
+//            }
+            linkNo = linkNo + c;
+        }
+        return linkNo;
+    }
 	
 	/**
 	 * json 对象转换成map
@@ -1030,5 +1090,25 @@ public class BaseUtil {
 //    	Map resultMap = BaseUtil.easypoiDownloadExcel1(colList, dataList, titleName, schoolId, response);
 //    	return resultMap;
 //    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 	
 }
