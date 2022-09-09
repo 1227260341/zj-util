@@ -1,10 +1,17 @@
-package com.jinyafu.util;
+package com.zj.modules.util;
 
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.Field;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,11 +37,30 @@ public class ReflectParamsUtils {
 	 * @return
 	 */
 	public static boolean checkClassIsHaveFeild(@SuppressWarnings("rawtypes") Class clazz, String fieldName) {
+	    if (clazz.isAssignableFrom(ArrayList.class)
+                ||clazz.isAssignableFrom(List.class)
+                ||clazz.isAssignableFrom(LinkedList.class)){
+	    }
 		Field[] fields = clazz.getDeclaredFields();
 		if (fields != null && fields.length > 0) {
 			for (Field field : fields) {
 				try {
-					if (field.getName().equals(fieldName)) {
+				    String typeName = field.getType().getTypeName();
+				    String name = field.getName();
+                    if (typeName.contains("List")) {
+                        System.out.println("List");
+                        //说明是list
+                        String currentTypeName = field.getGenericType().getTypeName();
+                        int indexOfStart = currentTypeName.indexOf("<");
+                        int indexOfEnd = currentTypeName.indexOf(">");
+                        String substring = currentTypeName.substring(indexOfStart + 1, indexOfEnd);
+                        Class<?> classItem = Class.forName(substring);
+                        boolean checkClassIsHaveFeild = checkClassIsHaveFeild(classItem, fieldName);
+                        if (checkClassIsHaveFeild) {
+                            return checkClassIsHaveFeild;
+                        }
+                    }
+					if (name.equals(fieldName)) {
 						return true;
 					}
 				} catch (Exception e) {
@@ -45,6 +71,55 @@ public class ReflectParamsUtils {
 		}
 		return false;
 	}
+	
+	public static boolean checkObjIsHaveFeild(Object obj, String fieldName) {
+	    if (obj == null) {
+	        return false;
+	    }
+	    Class<? extends Object> clazz = obj.getClass();
+        if (clazz.isAssignableFrom(ArrayList.class)
+                ||clazz.isAssignableFrom(List.class)
+                ||clazz.isAssignableFrom(LinkedList.class)){
+            //说明是list， 那么则  获取单个的，即可
+            List<Object> list = (List<Object>) obj;
+            if (CollectionUtils.isNotEmpty(list)) {//没有值的话就不用管
+                Object objectItem = list.get(0);
+                boolean checkObjIsHaveFeild = checkObjIsHaveFeild(objectItem, fieldName);
+                if (checkObjIsHaveFeild) {
+                    return checkObjIsHaveFeild;
+                }
+            }
+        }
+        Field[] fields = clazz.getDeclaredFields();
+        if (fields != null && fields.length > 0) {
+            for (Field field : fields) {
+                try {
+                    String typeName = field.getType().getTypeName();
+                    String name = field.getName();
+                    boolean primitive = field.getType().isPrimitive();
+                    if (name.equals(fieldName)) {
+                        return true;
+                    }
+                    if (!primitive && (typeName.contains("com.jinyafu") //说明是自身系统相关的类，那么则直接可以进行相关操作，及检测（外部类此处不管）
+                                || typeName.contains("List")
+                            )
+                            ) {
+                        System.out.println(typeName);
+                        field.setAccessible(true);
+                        Object objectItem = field.get(obj);
+                        boolean checkObjIsHaveFeild = checkObjIsHaveFeild(objectItem, fieldName);
+                        if (checkObjIsHaveFeild) {
+                            return checkObjIsHaveFeild;
+                        }
+                    }
+                } catch (Exception e) {
+                    logger.error("判断对象中是否存在该字段异常->ParamsUtils.checkObjectFieldIsHave:class->" + clazz.getName()
+                            + "|fieldName->" + fieldName, e);
+                }
+            }
+        }
+        return false;
+    }
  
 	/**
 	 * 判断对象中字段是否全为空值(除可为空字段外) 若对象除可为空字段外,其余字段全为空,返回true 用于更新数据库对象之前判空
@@ -156,6 +231,7 @@ public class ReflectParamsUtils {
             Class<?> classO = target.getClass();
             //判断字段是否存在
             boolean isExist = checkClassIsHaveFeild(classO, fieldName);
+//            boolean isExist1 = checkObjIsHaveFeild(target, fieldName);
             if (!isExist) {
                 return false;
             }
@@ -187,6 +263,16 @@ public class ReflectParamsUtils {
     public static void main(String[] args) throws Exception {
         
 //        TopcsWebPlugInUnitResDTO obj = new TopcsWebPlugInUnitResDTO();
+//        obj.setPlugInName("TTTTTTTTTTT");
+//        List<TopcsWebPlugWindowSetResExtDTO> windowSetResList = new ArrayList<TopcsWebPlugWindowSetResExtDTO>();
+//        TopcsWebPlugWindowSetResExtDTO dto = new TopcsWebPlugWindowSetResExtDTO();
+//        dto.setWindowName("zheshi asdasdsad");
+//        windowSetResList.add(dto);
+//        obj.setWindowSetResList(windowSetResList);
+//        obj.getWindowSetResList().stream().forEach(item -> {
+//            item.setWindowName("这是修改后的值啊");
+//        });
+        
         Object obj = null;
 //        obj.setPlugInName("asdad");
         String fieldName = "windowName";//需要修改的字段属性
