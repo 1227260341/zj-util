@@ -4,6 +4,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.IntStream;
 
 import org.apache.tomcat.util.threads.ThreadPoolExecutor;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -111,9 +112,7 @@ public class TestThreadController {
         System.out.println(a.incrementAndGet());
         System.out.println(1);
 		
-		
-		
-		
+        
 	}
 	
 }
