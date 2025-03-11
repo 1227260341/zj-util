@@ -225,6 +225,31 @@
 	      <artifactId>itext-asian</artifactId>
 	      <version>5.2.0</version>
 	    </dependency>
+	    
+	    <!-- 锁定OkHttp的版本 -->
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+            <version>3.8.1</version>
+        </dependency>
+	    <dependency>
+		    <groupId>org.web3j</groupId>
+		    <artifactId>core</artifactId>
+		    <version>5.0.0</version>
+        </dependency>
+        
+        <!-- BIP-44 分层确定性钱包支持 -->
+	    <dependency>
+	        <groupId>org.bitcoinj</groupId>
+	        <artifactId>bitcoinj-core</artifactId>
+	        <version>0.16.5</version>
+	    </dependency>
+	    <!-- Bouncy Castle (SOL) -->
+	    <dependency>
+	        <groupId>org.bouncycastle</groupId>
+	        <artifactId>bcprov-jdk15on</artifactId>
+	        <version>1.70</version>
+	    </dependency>
         
 	</dependencies>
 	

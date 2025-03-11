@@ -1018,6 +1018,24 @@ public class BaseUtil {
 	    return resultMap;
     }
     
+	/**
+     * 获取当前类相关属性
+     * @Description: 【可能存在一定的性能问题】【推荐】Java获取当前类名和方法名new Throwable().getStackTrace()
+     * 因为Thread对象本身必须在获取堆栈时保持线程安全性 用于关联线程，而在新Throwable（）上的堆栈跟踪中填充的Throwable已经知道它是针对调用线程的。
+     * @Copyright 深圳金雅福控股集团有限公司
+     * @author zhouzj
+     * @Date 2022-5-1710:03:50
+     * @Version: 1.0
+     * @param up  上几级，1代表当前
+     */
+    public static void getCurrentInfo(Integer up) {
+        StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+        String className = stackTrace[up].getClassName();
+        String fileName = stackTrace[up].getFileName();
+        int lineNumber = stackTrace[up].getLineNumber();
+        String methodName = stackTrace[up].getMethodName();
+//        log.info("获取当前类信息  》》》》》》 methodName3={}, lineNumber3 = {}, className3 = {} ", methodName, lineNumber, className);
+    }
     
     /**
      * 单科名次分布表(实例)
